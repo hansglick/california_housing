@@ -1,5 +1,6 @@
 from lib import *
 
+
 proj_buffer = pyproj.Proj(proj="utm", ellps="WGS84", datum="WGS84")
 
 
@@ -33,3 +34,36 @@ def ColorMapper(minval,maxval,values,palette = "PiYG"):
     m = cmap(norm(values))[:,:-1]
     hex_array = [matplotlib.colors.rgb2hex(item) for item in [tuple(m[row,:]) for row in range(m.shape[0])]]
     return hex_array
+
+
+
+
+def Draw_Random_Points(mypolygon,npoints_within_polygon):
+
+    within_points = []
+    minx,miny,maxx,maxy = mypolygon.bounds
+    x_coordinates = np.random.uniform(low=minx,high=maxx,size=100)
+    y_coordinates = np.random.uniform(low=miny,high=maxy,size=100)
+    counter = 0
+    
+    for x,y in zip(x_coordinates,y_coordinates):
+        mypoint = Point(x,y)
+        
+        if mypoint.within(mypolygon):
+            within_points.append((x,y))
+            counter = counter + 1
+            if counter == npoints_within_polygon:
+                break
+
+    return within_points
+
+
+class AutoVivification(dict):
+    """Implementation of perl's autovivification feature."""
+    def __getitem__(self, item):
+        try:
+            return dict.__getitem__(self, item)
+        except KeyError:
+            value = self[item] = type(self)()
+            return value
+
